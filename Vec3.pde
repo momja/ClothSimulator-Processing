@@ -17,6 +17,12 @@ public class Vec3 {
     this.y = copyVec.y;
     this.z = copyVec.z;
   }
+
+  public Vec3() {
+    this.x = 0;
+    this.y = 0;
+    this.z = 0;
+  }
   
   public String toString(){
     return "(" + x + ", " + y + ", " + z + ")";

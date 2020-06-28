@@ -10,9 +10,12 @@ void setup() {
 void draw() {
     cam.update();
     background(0);
-    // TODO : Insert Cloth Simulation Here
-    box(20,20,20);
-
+    update(1/frameRate)
     // Heads Up Display
     hud.draw();
+}
+
+void update(float dt) {
+    // TODO: Insert Cloth Simulation
+    
 }
