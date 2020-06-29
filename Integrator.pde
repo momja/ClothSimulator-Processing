@@ -11,6 +11,10 @@
 //    -A version of midpoint integration which returns a list of intermediate values
 //    -A version of Eulerian integration which returns a list of intermediate values
 
+float dxdt(float t, float x) {
+  return x;
+}
+
 //Eulerian Integration
 //Assume the current slope dx/dt holds true for the entire range dt
 float eulerian(float t_start, float x_start, int n_steps, float dt){

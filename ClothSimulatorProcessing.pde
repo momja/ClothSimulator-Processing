@@ -1,5 +1,6 @@
 Camera cam = new Camera();
 HeadsUpDisplay hud = new HeadsUpDisplay();
+RopeSimulator rope = new RopeSimulator(10, new Vec3(1,1,1));
 
 void setup() {
     size(640,480,P3D);
@@ -9,13 +10,14 @@ void setup() {
 
 void draw() {
     cam.update();
-    background(0);
-    update(1/frameRate)
+    background(255,255,255);
+    update(1/frameRate);
     // Heads Up Display
     hud.draw();
 }
 
 void update(float dt) {
     // TODO: Insert Cloth Simulation
-    
+    rope.update(dt);
+    rope.draw();
 }
