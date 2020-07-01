@@ -42,6 +42,12 @@ float midpoint(float t_start, float x_start, int n_steps, float dt){
     t += dt;
   }
   return x;
+
+  // float k1 = dxdt(t,x);
+  // float k2 = dxdt(t+dt/2,x+dt*k1/2);
+  // float k3 = dxdt(t+dt,x+dt*k2);
+  // x += (k1+2*k2+k3)*dt/4;
+  // t += dt;
 }
 
 //RK4 - or "The Runge–Kutta method"
