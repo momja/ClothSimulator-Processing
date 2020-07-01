@@ -2,7 +2,7 @@ class HeadsUpDisplay {
     public boolean showFrameRate = true;
     public PFont font;
     public float fontSize;
-    public color defaultColor = color(0, 0, 0);
+    public color defaultColor = color(255);
 
     public HeadsUpDisplay() {
     }
@@ -15,7 +15,7 @@ class HeadsUpDisplay {
         textMode(MODEL);
         textSize(24);
         textAlign(LEFT, TOP);
-        text("fps "+round(frameRate), 10, 10);
+        text("fps "+round(frameRate), 30, 30);
         pop();
         hint(ENABLE_DEPTH_TEST);
     }

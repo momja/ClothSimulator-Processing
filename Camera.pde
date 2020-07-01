@@ -5,6 +5,11 @@ class Camera {
     float cameraRadius = 30;
     int slider = 0;
     float theta = 0;
+    float fov = 55;
+    float nearPlaneW = 1 + 1.f/3;
+    float nearPlaneH = 1;
+    float nearPlaneDist = 1;
+    float farPlaneDist = 1000;
 
     public void update() {
         if (keyPressed) {
@@ -24,5 +29,9 @@ class Camera {
         camera(camLocation.x, camLocation.y, camLocation.z,
                camLookAt.x,   camLookAt.y,   camLookAt.z,
                camUp.x,       camUp.y,       camUp.z);
+    }
+
+    public void setPerspective() {
+         perspective(radians(fov), nearPlaneW/nearPlaneH, nearPlaneDist, farPlaneDist);
     }
 }

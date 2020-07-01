@@ -23,6 +23,12 @@ public class Vec3 {
     this.y = 0;
     this.z = 0;
   }
+
+  public Vec3(PVector v) {
+    this.x = v.x;
+    this.y = v.y;
+    this.z = v.z;
+  }
   
   public String toString(){
     return "(" + x + ", " + y + ", " + z + ")";
