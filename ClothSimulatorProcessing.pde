@@ -1,10 +1,10 @@
 Camera cam = new Camera();
 HeadsUpDisplay hud = new HeadsUpDisplay();
 PShape[] rigidBodies = new PShape[1];
-OctreeTriangles ot = new OctreeTriangles(new OctantTris(new Vec3(0,0,0), new Vec3(20,40,20)), 20);
+OctreeTriangles ot = new OctreeTriangles(new OctantTris(new Vec3(0,0,0), new Vec3(20,40,20)), 15);
 Vec3 bunnyPosition = new Vec3();
-int clothWidth = 30;
-int clothHeight = 30;
+int clothWidth = 15;
+int clothHeight = 15;
 ClothMesh cloth;
 
 void setup() {
@@ -39,7 +39,7 @@ void draw() {
 }
 
 void update(float dt) {
-    cloth.updateMidpoint(0.003);
+    cloth.updateMidpoint(dt);
 }
 
 void updateRigidBodies() {

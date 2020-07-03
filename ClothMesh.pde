@@ -1,8 +1,8 @@
 public class ClothMesh {
-  public float ks = 2000;
-  public float kd = 2000;
-  public float restLength = 0.1;
-  public float vertexMass = 2;
+  public float ks = 2600;
+  public float kd = 1800;
+  public float restLength = 0.15;
+  public float vertexMass = 2.8;
   public Vec3 gravity = new Vec3(0,-10,0);
   public boolean debugMode = false;
 
@@ -11,9 +11,8 @@ public class ClothMesh {
   private Vec3[][] prevPositions;
   public Vec3[][] positions;
   private Vec3[][] velocities;
-  private Vec3[][] accelerations;
   private Vec3[][] nodesOnSurfaceNormals;
-  private int stepCount = 40;
+  private int stepCount = 30;
 
   // Constructor
   public ClothMesh(int width, int height) {
@@ -25,7 +24,6 @@ public class ClothMesh {
     prevPositions = new Vec3[height][width];
     positions = new Vec3[height][width];
     velocities = new Vec3[height][width];
-    accelerations = new Vec3[height][width];
     nodesOnSurfaceNormals = new Vec3[height][width];
     
     // Initialize the vertices so that the cloth is flat.
@@ -34,7 +32,6 @@ public class ClothMesh {
         positions[i][j] = new Vec3(i * restLength - restLength*height/2, 0, j * restLength - restLength*width/2);
         prevPositions[i][j] = new Vec3(positions[i][j]);
         velocities[i][j] = new Vec3(0, 0, 0);
-        accelerations[i][j] = new Vec3(0, 0, 0);
         nodesOnSurfaceNormals[i][j] = null;
       }
     }
@@ -68,7 +65,7 @@ public class ClothMesh {
         for (int j = 0; j < clothWidth; j++) {
             strokeWeight(1);
             stroke(0, 255, 0);
-            Vec3 velDir = positions[i][j].plus(velocities[i][j].times(0.3));
+            Vec3 velDir = positions[i][j].plus(velocities[i][j].times(0.1));
             line(positions[i][j].x,   positions[i][j].y,   positions[i][j].z,
                     velDir.x, velDir.y, velDir.z);
             strokeWeight(5);
@@ -77,74 +74,6 @@ public class ClothMesh {
         }
     }
     popStyle();
-  }
-
-  public void updateHookes() {
-      // Vertical
-      for (int i = 0; i < height - 1; i++) {
-      for (int j = 0; j < width; j++) {
-        // Hooke's Law
-        Vec3 springVector = positions[i+1][j].minus(positions[i][j]);
-        float springLength = springVector.length();
-        springVector.normalize();
-        float springForce = -ks * (springLength - restLength);
-
-        // Damping
-        float v1 = dot(springVector, velocities[i][j]);
-        float v2 = dot(springVector, velocities[i+1][j]);
-        float dampingForce = -kd * (v1 - v2);
-
-        Vec3 totalForce = springVector.times(springForce + dampingForce);
-        accelerations[i][j].subtract(totalForce.times(1f/vertexMass));
-        accelerations[i+1][j] = totalForce.times(1f/vertexMass).plus(gravity);
-        
-        assert !Double.isNaN(accelerations[i][j].x + accelerations[i][j].y + accelerations[i][j].z) : "Hookes Law Failure";
-      }
-      }
-
-    //   // Horizontal
-    //   for (int i = 0; i < height; i++) {
-    //   for (int j = 0; j < width - 1; j++) {
-    //     // Hooke's Law
-    //     Vec3 springVector = positions[i][j+1].minus(positions[i][j]);
-    //     float springLength = springVector.length();
-    //     springVector.normalize();
-    //     float springForce = -ks * (springLength - restLength);
-
-    //     // Damping
-    //     float v1 = dot(springVector, velocities[i][j]);
-    //     float v2 = dot(springVector, velocities[i][j+1]);
-    //     float dampingForce = -kd * (v1 - v2);
-
-    //     Vec3 totalForce = springVector.times(springForce + dampingForce);
-    //     accelerations[i][j].subtract(totalForce.times(0.5/vertexMass));
-    //     accelerations[i][j+1].add(totalForce.times(0.5/vertexMass));
-
-    //     assert !Double.isNaN(accelerations[i][j].x + accelerations[i][j].y + accelerations[i][j].z) : "Hookes Law Failure";
-    //   }
-    //   }
-  }
-  
-  
-  // This updates the cloth using simple Eulerian integration.
-  // Note: This requires an extremely small dt (<= 0.001).
-  public void updateEulerian(float dt) {
-    dt = dt/stepCount;
-    for (int w = 0; w < stepCount; w++) {        
-        updateHookes();
-        for (int i = 1; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            velocities[i][j].add(accelerations[i][j].times(dt));
-        }
-        }
-        
-        // Update the positions.
-        for (int i = 1; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            positions[i][j].add(velocities[i][j].times(dt));
-        }
-        }
-    }
   }
   
 
@@ -260,6 +189,7 @@ public class ClothMesh {
         for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             positions[i][j].add(velocities[i][j].times(dt));
+            velocities[i][j] = finalVelocities[i][j];
 
             Vec3 normal = nodesOnSurfaceNormals[i][j];
             if (normal != null) {
@@ -268,10 +198,19 @@ public class ClothMesh {
                     velocities[i][j].subtract(projAB(velocities[i][j], normal));
                 }
             }
-            velocities[i][j] = finalVelocities[i][j];
         }
         }
-
+        for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            Vec3 normal = nodesOnSurfaceNormals[i][j];
+            if (normal != null) {
+                // Exclude velocity in direction of surface
+                if (dot(velocities[i][j], normal) < 0) {
+                    velocities[i][j].subtract(projAB(velocities[i][j], normal));
+                }
+            }
+        }
+        }
         checkForCollisions();
     }
   }
@@ -306,9 +245,9 @@ public class ClothMesh {
                     }
                 }
             }
-            if (furthestColl != null) {
+            if (maxT >= 0) {
                 if (nodesOnSurfaceNormals[i][j] == null || !nodesOnSurfaceNormals[i][j].equals(furthestColl.surfaceNormal)) {
-                        // nodes[i] = furthestColl.position;
+                        // positions[i][j] = furthestColl.position;
                         positions[i][j] = furthestColl.position.plus(furthestColl.surfaceNormal.times(0.01));
                         nodesOnSurfaceNormals[i][j] = furthestColl.surfaceNormal;
                 }
