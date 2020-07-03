@@ -89,9 +89,9 @@ public CollisionInfo rayTriangleCollision(Ray3 ray, PShape triangle) {
         // Haven't hit yet
         return null;
     }
-    
+
     Vec3 p = rayOrigin.plus(rayDirection.times(t));
-    
+
     if (pointLiesOnTriangle(p, vert1, vert2, vert3, e1, e2)) {
         return new CollisionInfo(p, surfaceNormal, t);
     } else {

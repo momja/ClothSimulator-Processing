@@ -25,4 +25,13 @@ class Ray3 {
         sign[1] = int(invDir.y < 0);
         sign[2] = int(invDir.z < 0);
     }
+
+    public void debugDraw() {
+        pushStyle();
+        stroke(255,255,0);
+        strokeWeight(1);
+        if (magnitude > 0) line(origin.x, origin.y, origin.z, origin.x+direction.x*magnitude, origin.y+direction.y*magnitude, origin.z+direction.z*magnitude);
+        else line(origin.x, origin.y, origin.z, origin.x+direction.x*10, origin.y+direction.y*10, origin.z+direction.z*10);
+        popStyle();
+    }
 }

@@ -49,9 +49,6 @@ class RopeSimulator {
     public void update(float dt) {
         int stepCount = 80;
         float timeStep = dt/stepCount;
-        if (debugMode) {
-            triangleCollisionsDebug = new ArrayList<PShape>();
-        }
         // Eulerian
         // --------
         for (int j = 0; j < stepCount; j++) {
