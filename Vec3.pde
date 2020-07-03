@@ -29,6 +29,10 @@ public class Vec3 {
     this.y = v.y;
     this.z = v.z;
   }
+
+  public boolean equals(Vec3 v) {
+    return this.x == v.x && this.y == v.y && this.z == v.z;
+  }
   
   public String toString(){
     return "(" + x + ", " + y + ", " + z + ")";
@@ -81,6 +85,7 @@ public class Vec3 {
   
   public Vec3 normalized(){
     float magnitude = this.length();
+    assert magnitude > 0 : "zero magnitude";
     return new Vec3(this.x/magnitude, this.y/magnitude, this.z/magnitude);
   }
   
@@ -113,7 +118,8 @@ Vec3 cross(Vec3 a, Vec3 b){
 }
 
 Vec3 projAB(Vec3 a, Vec3 b){
-  return b.times(dot(a, b));
+  float len = b.length();
+  return b.times(dot(a, b)/(len*len));
 }
 
 Vec3 reflect(Vec3 d, Vec3 n) {
