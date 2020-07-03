@@ -57,13 +57,14 @@ class RopeSimulator {
         for (int j = 0; j < stepCount; j++) {
             for (int i = 1; i < segments; i++) {
                 nodeVelocities[i].add(nodeAccelerations[i].times(timeStep));
-                if (nodesOnSurfaceNormals[i] != null) {
+                Vec3 normal = nodesOnSurfaceNormals[i];
+                if (normal != null) {
                     // Exclude velocity moving into the triangle
-                    if (dot(nodeVelocities[i], nodesOnSurfaceNormals[i]) < 0) {
-                        nodeVelocities[i].subtract(projAB(nodeVelocities[i], nodesOnSurfaceNormals[i]));
+                    if (dot(nodeVelocities[i], normal) < 0) {
+                        nodeVelocities[i].subtract(projAB(nodeVelocities[i], normal));
                     }
                     // Subtract friction
-                    nodeVelocities[i].mul(0.99);
+                    // nodeVelocities[i].mul(0.999);
                 }
                 // assert Double.isNaN(nodeVelocities[i].x+nodeVelocities[i].y+nodeVelocities[i].z);
             }
@@ -118,7 +119,7 @@ class RopeSimulator {
             strokeWeight(0.5);
             line(nodes[i].x,   nodes[i].y,   nodes[i].z,
                  nodes[i+1].x, nodes[i+1].y, nodes[i+1].z);
-            strokeWeight(10);
+            strokeWeight(5);
             point(nodes[i+1].x, nodes[i+1].y, nodes[i+1].z);
         }
         popStyle();
@@ -159,35 +160,33 @@ class RopeSimulator {
             }
             Ray3 r = new Ray3(p1, motionVec, motionVec.length());
             ArrayList<PShape> tris = ot.rayIntersectsOctants(r);
-            CollisionInfo closestColl = null;
-            float minT = Float.MAX_VALUE;
-            PShape closestTri = null;
-            int cnt = 0;
+            CollisionInfo furthestColl = null;
+            float maxT = -1;
             for (PShape tri : tris) {
                 CollisionInfo coll = rayTriangleCollision(r, tri);
-                if (coll != null && coll.t < minT) {
-                    closestColl = coll;
-                    minT = coll.t;
-                    closestTri = tri;
+                if (coll != null) {
+                    if (coll.t > maxT) {
+                        furthestColl = coll;
+                        maxT = coll.t;
+                    }
                 }
             }
-            if (closestColl == null) {
-                nodesOnSurfaceNormals[i] = null;
-            } else {
-                if (nodesOnSurfaceNormals[i] == null || !nodesOnSurfaceNormals[i].equals(closestColl.surfaceNormal)) {
-                    // nodes[i] = closestColl.position;
-                    nodes[i] = closestColl.position.plus(closestColl.surfaceNormal.times(0.01));
+            if (furthestColl != null) {
+                if (nodesOnSurfaceNormals[i] == null || !nodesOnSurfaceNormals[i].equals(furthestColl.surfaceNormal)) {
+                        // nodes[i] = furthestColl.position;
+                        nodes[i] = furthestColl.position.plus(furthestColl.surfaceNormal.times(0.01));
+                        nodesOnSurfaceNormals[i] = furthestColl.surfaceNormal;
                 }
-                nodesOnSurfaceNormals[i] = closestColl.surfaceNormal;
                 if (debugMode) {
-                    triangleCollisionsDebug.add(closestTri);
                     // Show green dot where collision occurs
                     pushStyle();
                     strokeWeight(15);
                     stroke(0,255,0);
-                    point(closestColl.position.x, closestColl.position.y, closestColl.position.z);
+                    point(furthestColl.position.x, furthestColl.position.y, furthestColl.position.z);
                     popStyle();
                 }
+            } else {
+                nodesOnSurfaceNormals[i] = null;
             }
         }
     }
