@@ -3,7 +3,7 @@ public class ClothMesh {
   public float kd = 1800;
   public float restLength = 0.25;
   public float vertexMass = 2.8;
-  public Vec3 gravity = new Vec3(0,-10,0);
+  public Vec3 gravity = new Vec3(0,-5,0);
   public boolean debugMode = false;
 
   private int width;
@@ -13,14 +13,16 @@ public class ClothMesh {
   private Vec3[][] velocities;
   private Vec3[][] nodesOnSurfaceNormals;
   private int stepCount = 30;
+  private Vec3 spawnPoint;
 
   // Constructor
-  public ClothMesh(int width, int height) {
+  public ClothMesh(int width, int height, Vec3 spawnPoint) {
     this.width = width;
     this.height = height;
     this.restLength = restLength;
     this.vertexMass = vertexMass;
     this.gravity = gravity;
+    this.spawnPoint = spawnPoint;
     prevPositions = new Vec3[height][width];
     positions = new Vec3[height][width];
     velocities = new Vec3[height][width];
@@ -30,6 +32,7 @@ public class ClothMesh {
     for (int i = 0; i < height; i++) {
       for (int j = 0; j < width; j++) {
         positions[i][j] = new Vec3(i * restLength - restLength*height/2, 0, j * restLength - restLength*width/2);
+        positions[i][j].add(spawnPoint);
         prevPositions[i][j] = new Vec3(positions[i][j]);
         velocities[i][j] = new Vec3(0, 0, 0);
         nodesOnSurfaceNormals[i][j] = null;
@@ -136,7 +139,7 @@ public class ClothMesh {
         for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             if (i == 0) { // Clamp
-            midpointVelocities[i][j] = new Vec3(0, 0, 0);
+            // midpointVelocities[i][j] = new Vec3(0, 0, 0);
             }
             else { // Gravity
             midpointVelocities[i][j].add(gravity.times(dt));
@@ -191,7 +194,7 @@ public class ClothMesh {
         for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
             if (i == 0) { // Clamp
-            finalVelocities[i][j] = new Vec3(0, 0, 0);
+            // finalVelocities[i][j] = new Vec3(0, 0, 0);
             }
             else { // Gravity
             finalVelocities[i][j].add(gravity.times(dt));
@@ -204,7 +207,6 @@ public class ClothMesh {
         for (int j = 0; j < width; j++) {
             positions[i][j].add(velocities[i][j].times(dt));
             velocities[i][j] = finalVelocities[i][j];
-
             Vec3 normal = nodesOnSurfaceNormals[i][j];
             if (normal != null) {
                 // Exclude velocity in direction of surface
@@ -215,17 +217,6 @@ public class ClothMesh {
         }
         }
         checkForCollisions();
-        for (int i = 0; i < height; i++) {
-        for (int j = 0; j < width; j++) {
-            Vec3 normal = nodesOnSurfaceNormals[i][j];
-            if (normal != null) {
-                // Exclude velocity in direction of surface
-                if (dot(velocities[i][j], normal) < 0) {
-                    velocities[i][j].subtract(projAB(velocities[i][j], normal));
-                }
-            }
-        }
-        }
     }
   }
 
@@ -235,9 +226,6 @@ public class ClothMesh {
           for (int j = 0; j < width; j++) {
             Vec3 p1 = prevPositions[i][j];
             Vec3 p2 = positions[i][j];
-            if (rigidBodies == null) {
-                return;
-            }
             Vec3 motionVec = p1.minus(p2);
             if (motionVec.length() == 0) {
                 // The previous and current posiitions are the same, nothing required
@@ -272,6 +260,13 @@ public class ClothMesh {
                     stroke(0,255,0);
                     point(furthestColl.position.x, furthestColl.position.y, furthestColl.position.z);
                     popStyle();
+                }
+            }
+            for (Sphere sphere : collisionSpheres) {
+                if (sphere.pointInSphere(positions[i][j])) {
+                    // Move point out of sphere
+                    positions[i][j] = sphere.center.plus(positions[i][j].minus(sphere.center).normalized().times(sphere.radius));
+                    velocities[i][j].subtract(projAB(velocities[i][j], positions[i][j].minus(sphere.center).normalized()));
                 }
             }
           }
