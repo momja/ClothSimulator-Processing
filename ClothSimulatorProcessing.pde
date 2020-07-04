@@ -4,10 +4,11 @@ PShape[] rigidBodies = new PShape[1];
 Sphere[] collisionSpheres = new Sphere[1];
 OctreeTriangles ot = new OctreeTriangles(new OctantTris(new Vec3(0,0,0), new Vec3(20,40,20)), 15);
 Vec3 bunnyPosition = new Vec3();
-int clothWidth = 11;
-int clothHeight = 11;
+int clothWidth = 31;
+int clothHeight = 31;
 ClothMesh cloth;
 Fan fan;
+boolean paused = false;
 
 void setup() {
     size(1280,960,P3D);
@@ -16,7 +17,8 @@ void setup() {
 
     // initialize variables
     cloth = new ClothMesh(clothWidth, clothHeight, new Vec3(0,5,0));
-    cloth.debugMode = true;
+    cloth.materialColor = new Vec3(255,152,19);
+    // cloth.debugMode = true;
     fan = new Fan();
     rigidBodies[0] = loadShape("sphere.obj");
     collisionSpheres[0] = new Sphere(1f, new Vec3(0,0,0));
@@ -32,9 +34,13 @@ void setup() {
 
 void draw() {
     cam.update();
+
     background(20,20,20);
     lights();
-    update(1.f/frameRate);
+    directionalLight(1, -1, -1, 255, 255, 255);
+    if (!paused) {
+        update(1.f/frameRate);
+    }
 
     cloth.draw();
     fan.draw();
@@ -43,6 +49,12 @@ void draw() {
     }
 
     // shape(rigidBodies[0]);
+}
+
+void keyPressed() {
+    if (key == ' ') {
+        paused = !paused;
+    }
 }
 
 void update(float dt) {

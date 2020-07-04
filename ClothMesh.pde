@@ -1,10 +1,11 @@
 public class ClothMesh {
   public float ks = 2600;
   public float kd = 1800;
-  public float restLength = 0.25;
+  public float restLength = 0.1;
   public float vertexMass = 2.8;
   public Vec3 gravity = new Vec3(0,-5,0);
   public boolean debugMode = false;
+  public Vec3 materialColor = new Vec3(255,255,255);
 
   private int width;
   private int height;
@@ -41,6 +42,9 @@ public class ClothMesh {
   }
 
   public void draw() {
+    pushStyle();
+    fill(materialColor.x, materialColor.y, materialColor.z);
+    noStroke();
     for (int i = 0; i < height-1; i++) {
     beginShape(TRIANGLE_STRIP);
         for (int j = 0; j < width-1; j++) {
@@ -55,6 +59,7 @@ public class ClothMesh {
         }
     endShape();
     }
+    popStyle();
     if (debugMode) {
         debugDraw();
     }
@@ -265,7 +270,7 @@ public class ClothMesh {
             for (Sphere sphere : collisionSpheres) {
                 if (sphere.pointInSphere(positions[i][j])) {
                     // Move point out of sphere
-                    positions[i][j] = sphere.center.plus(positions[i][j].minus(sphere.center).normalized().times(sphere.radius));
+                    positions[i][j] = sphere.center.plus(positions[i][j].minus(sphere.center).normalized().times(sphere.radius+0.2));
                     velocities[i][j].subtract(projAB(velocities[i][j], positions[i][j].minus(sphere.center).normalized()));
                 }
             }

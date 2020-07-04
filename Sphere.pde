@@ -10,6 +10,7 @@ class Sphere {
     public void draw() {
         push();
         fill(fillColor.x, fillColor.y, fillColor.z);
+        noStroke();
         translate(center.x, center.y, center.z);
         sphere(radius);
         pop();
