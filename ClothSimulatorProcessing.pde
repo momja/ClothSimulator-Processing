@@ -4,8 +4,8 @@ PShape[] rigidBodies = new PShape[1];
 Sphere[] collisionSpheres = new Sphere[1];
 OctreeTriangles ot = new OctreeTriangles(new OctantTris(new Vec3(0,0,0), new Vec3(20,40,20)), 15);
 Vec3 bunnyPosition = new Vec3();
-int clothWidth = 41;
-int clothHeight = 41;
+int clothWidth = 21;
+int clothHeight = 21;
 ClothMesh cloth;
 Fan fan;
 boolean paused = false;
@@ -16,12 +16,12 @@ void setup() {
     surface.setTitle("Cloth Simulation [Max Omdal]");
 
     // initialize variables
-    cloth = new ClothMesh(clothWidth, clothHeight, new Vec3(1.0,5,0));
+    cloth = new ClothMesh(clothWidth, clothHeight, new Vec3(1,5,0));
     cloth.materialColor = new Vec3(255,152,19);
     // cloth.debugMode = true;
     fan = new Fan();
     rigidBodies[0] = loadShape("sphere.obj");
-    collisionSpheres[0] = new Sphere(1f, new Vec3(0,0,0));
+    collisionSpheres[0] = new Sphere(2f, new Vec3(0,0,0));
 
     // for (PShape rigidBody : rigidBodies) {
     //     int triCount = rigidBody.getChildCount();
@@ -44,15 +44,12 @@ void draw() {
     }
 
     cloth.draw();
-    fan.draw();
     for (Sphere sphere : collisionSpheres) {
         sphere.draw();
     }
+    fan.draw();
 
     f++;
-    if (f == 10) {
-        paused = true;
-    }
 
     // shape(rigidBodies[0]);
 }
@@ -69,15 +66,16 @@ void update(float dt) {
     // Draw Fan
     if (mousePressed) {
         Ray3 mouseRay = getMouseCast();
-        CollisionInfo c = raySphereCollision(mouseRay, cam.camLookAt, 4);
+        CollisionInfo c = raySphereCollision(mouseRay, cam.camLookAt, 4.3);
         if (c != null) {
-            fan.hidden = false;
+            fan.hide(false);
             Vec3 fanPos = c.position;
             fan.updatePosition(fanPos, cam.camLookAt, cam.camUp, dt);
         } else {
-            fan.hidden = true;
+            fan.hide(true);
         }
     } else {
-        fan.hidden = true;
+        fan.hide(true);
     }
+    fan.updateWindParticles(dt);
 }

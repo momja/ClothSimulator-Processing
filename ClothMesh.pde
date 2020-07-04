@@ -1,6 +1,6 @@
 public class ClothMesh {
   public float ks = 3000;
-  public float kd = 2000;
+  public float kd = 2500;
   public float restLength = 0.05;
   public float vertexMass = 3;
   public Vec3 gravity = new Vec3(0,-0.5,0);
@@ -14,7 +14,7 @@ public class ClothMesh {
   public Vec3[][] positions;
   private Vec3[][] velocities;
   private Vec3[][] nodesOnSurfaceNormals;
-  private int stepCount = 30;
+  private int stepCount = 20;
   private Vec3 spawnPoint;
 
   // Constructor
@@ -275,7 +275,10 @@ public class ClothMesh {
                     // Move point out of sphere
                     Vec3 normal = positions[i][j].minus(sphere.center).normalized();
                     positions[i][j] = sphere.center.plus(normal.times(sphere.radius));
-                    velocities[i][j] = reflect(velocities[i][j], normal).times(0.2);
+                    // velocities[i][j] = reflect(velocities[i][j], normal).times(0.2);
+                    // velocities[i][j].add(reflect(velocities[i][j], normal).times(0.001));
+                    velocities[i][j].subtract(projAB(velocities[i][j], normal));
+                    velocities[i][j].mul(0.999); // Friction
                 }
             }
           }
