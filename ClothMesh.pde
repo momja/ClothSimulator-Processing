@@ -1,7 +1,7 @@
 public class ClothMesh {
-  public float ks = 2600;
-  public float kd = 1800;
-  public float restLength = 0.1;
+  public float ks = 3600;
+  public float kd = 3100;
+  public float restLength = 0.05;
   public float vertexMass = 2.8;
   public Vec3 gravity = new Vec3(0,-5,0);
   public boolean debugMode = false;
@@ -270,8 +270,9 @@ public class ClothMesh {
             for (Sphere sphere : collisionSpheres) {
                 if (sphere.pointInSphere(positions[i][j])) {
                     // Move point out of sphere
-                    positions[i][j] = sphere.center.plus(positions[i][j].minus(sphere.center).normalized().times(sphere.radius+0.2));
-                    velocities[i][j].subtract(projAB(velocities[i][j], positions[i][j].minus(sphere.center).normalized()));
+                    Vec3 normal = positions[i][j].minus(sphere.center).normalized();
+                    positions[i][j] = sphere.center.plus(normal.times(sphere.radius));
+                    velocities[i][j] = reflect(velocities[i][j], normal).times(0.1);
                 }
             }
           }

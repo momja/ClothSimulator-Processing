@@ -12,7 +12,7 @@ class Sphere {
         fill(fillColor.x, fillColor.y, fillColor.z);
         noStroke();
         translate(center.x, center.y, center.z);
-        sphere(radius);
+        sphere(radius-0.01);
         pop();
     }
 
