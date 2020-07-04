@@ -17,7 +17,7 @@ class Fan {
         this.position = position;
         this.lookat = lookat;
         this.up = up;
-        theta += dt*10;
+        theta += dt*20;
         theta = theta % (2*PI);
     }
 

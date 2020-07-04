@@ -16,7 +16,7 @@ void setup() {
     surface.setTitle("Cloth Simulation [Max Omdal]");
 
     // initialize variables
-    cloth = new ClothMesh(clothWidth, clothHeight, new Vec3(0,5,0));
+    cloth = new ClothMesh(clothWidth, clothHeight, new Vec3(1.0,5,0));
     cloth.materialColor = new Vec3(255,152,19);
     // cloth.debugMode = true;
     fan = new Fan();
@@ -32,6 +32,7 @@ void setup() {
     // }
 }
 
+int f = 0;
 void draw() {
     cam.update();
 
@@ -46,6 +47,11 @@ void draw() {
     fan.draw();
     for (Sphere sphere : collisionSpheres) {
         sphere.draw();
+    }
+
+    f++;
+    if (f == 10) {
+        paused = true;
     }
 
     // shape(rigidBodies[0]);

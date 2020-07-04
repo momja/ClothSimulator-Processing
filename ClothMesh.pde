@@ -1,11 +1,12 @@
 public class ClothMesh {
-  public float ks = 3600;
-  public float kd = 3100;
+  public float ks = 3000;
+  public float kd = 2000;
   public float restLength = 0.05;
-  public float vertexMass = 2.8;
-  public Vec3 gravity = new Vec3(0,-5,0);
+  public float vertexMass = 3;
+  public Vec3 gravity = new Vec3(0,-0.5,0);
   public boolean debugMode = false;
   public Vec3 materialColor = new Vec3(255,255,255);
+  public boolean clampTop = false;
 
   private int width;
   private int height;
@@ -143,13 +144,14 @@ public class ClothMesh {
         // Apply gravity and clamp the top of the cloth.
         for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            if (i == 0) { // Clamp
-            // midpointVelocities[i][j] = new Vec3(0, 0, 0);
-            }
-            else { // Gravity
             midpointVelocities[i][j].add(gravity.times(dt));
-            }
         }
+        }
+
+        for (int j = 0; j < width; j++) {
+            if (clampTop) {
+                midpointVelocities[0][j] = new Vec3(0,0,0);
+            }
         }
         
         // Update the midpoint positions.
@@ -198,13 +200,14 @@ public class ClothMesh {
         // Apply gravity and clamp the top of the cloth (again).
         for (int i = 0; i < height; i++) {
         for (int j = 0; j < width; j++) {
-            if (i == 0) { // Clamp
-            // finalVelocities[i][j] = new Vec3(0, 0, 0);
-            }
-            else { // Gravity
             finalVelocities[i][j].add(gravity.times(dt));
-            }
         }
+        }
+
+        for (int j = 0; j < width; j++) {
+            if (clampTop) {
+                midpointVelocities[0][j] = new Vec3(0,0,0);
+            }
         }
         
         // Update the final velocities and positions.
@@ -272,7 +275,7 @@ public class ClothMesh {
                     // Move point out of sphere
                     Vec3 normal = positions[i][j].minus(sphere.center).normalized();
                     positions[i][j] = sphere.center.plus(normal.times(sphere.radius));
-                    velocities[i][j] = reflect(velocities[i][j], normal).times(0.1);
+                    velocities[i][j] = reflect(velocities[i][j], normal).times(0.2);
                 }
             }
           }
