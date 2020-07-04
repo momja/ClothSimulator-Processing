@@ -157,11 +157,48 @@ public Vec3 lineTriangleCollision(Vec3 p1, Vec3 p2, PShape[] rigidBodies) {
     return closestPoint;
 }
 
+public CollisionInfo raySphereCollision(Ray3 ray, Vec3 center, float radius) {
+    float t = -1.f;
+    float B = 2.f*(ray.direction.x*(ray.origin.x - center.x) +
+                 ray.direction.y*(ray.origin.y - center.y) +
+                 ray.direction.z*(ray.origin.z - center.z));
+    float C = pow(ray.origin.x - center.x, 2) +
+              pow(ray.origin.y - center.y, 2) +
+              pow(ray.origin.z - center.z, 2)
+              - pow(radius, 2);
+
+    float discriminant = pow(B, 2) - 4*C;
+
+    if (discriminant < 0) {
+        // No intersections exist
+        return null;
+    }
+
+    float t1 = (-B + sqrt(discriminant))/2.f;
+    float t2 = (-B - sqrt(discriminant))/2.f;
+
+    if (t1 > t2) {
+        float tmp = t1;
+        t1 = t2;
+        t2 = tmp;
+    }
+    if (t1 < 0.0001) {
+        t1 = t2; // if t0 is negative, let's use t1 instead
+        if (t1 < 0.0001) return null; // both t0 and t1 are negative
+    }
+
+    t = t1;
+
+    Vec3 p = ray.pointAtTime(t);
+    Vec3 surfaceNormal = p.minus(center).normalized();
+
+    return new CollisionInfo(p, surfaceNormal, t);
+}
+
 class CollisionInfo {
     Vec3 position;
     Vec3 surfaceNormal;
     float t;
-    PShape tri;
     public CollisionInfo(Vec3 position, Vec3 surfaceNormal, float t) {
         this.position = position;
         this.surfaceNormal = surfaceNormal;

@@ -34,4 +34,8 @@ class Ray3 {
         else line(origin.x, origin.y, origin.z, origin.x+direction.x*10, origin.y+direction.y*10, origin.z+direction.z*10);
         popStyle();
     }
+
+    public Vec3 pointAtTime(float t) {
+        return origin.plus(direction.times(t));
+    }
 }
