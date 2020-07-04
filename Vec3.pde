@@ -119,8 +119,7 @@ Vec3 cross(Vec3 a, Vec3 b){
 }
 
 Vec3 projAB(Vec3 a, Vec3 b){
-  float len = b.length();
-  return b.times(dot(a, b)/(len*len));
+  return b.times(dot(a, b));
 }
 
 Vec3 reflect(Vec3 d, Vec3 n) {

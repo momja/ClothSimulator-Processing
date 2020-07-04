@@ -1,7 +1,7 @@
 public class ClothMesh {
   public float ks = 2600;
   public float kd = 1800;
-  public float restLength = 0.15;
+  public float restLength = 0.25;
   public float vertexMass = 2.8;
   public Vec3 gravity = new Vec3(0,-10,0);
   public boolean debugMode = false;
@@ -38,6 +38,26 @@ public class ClothMesh {
   }
 
   public void draw() {
+    for (int i = 0; i < height-1; i++) {
+    beginShape(TRIANGLE_STRIP);
+        for (int j = 0; j < width-1; j++) {
+            Vec3 node1 = positions[i+1][j];
+            Vec3 node2 = positions[i][j];
+            Vec3 node3 = positions[i+1][j+1];
+            Vec3 node4 = positions[i][j+1];
+            vertex(node1.x, node1.y, node1.z);
+            vertex(node2.x, node2.y, node2.z);
+            vertex(node3.x, node3.y, node3.z);
+            vertex(node4.x, node4.y, node4.z);
+        }
+    endShape();
+    }
+    if (debugMode) {
+        debugDraw();
+    }
+  }
+
+  public void debugDraw() {
     // Debug drawing for cloth.
     pushStyle();
     stroke(255,0,0);
@@ -54,12 +74,6 @@ public class ClothMesh {
       }
     }
     popStyle();
-    if (debugMode) {
-        debugDraw();
-    }
-  }
-
-  public void debugDraw() {
     pushStyle();
     for (int i = 0; i < clothHeight; i++) {
         for (int j = 0; j < clothWidth; j++) {
@@ -215,7 +229,7 @@ public class ClothMesh {
     }
   }
 
-  
+
   public void checkForCollisions() {
       for (int i = 0; i < height; i++) {
           for (int j = 0; j < width; j++) {
@@ -259,8 +273,6 @@ public class ClothMesh {
                     point(furthestColl.position.x, furthestColl.position.y, furthestColl.position.z);
                     popStyle();
                 }
-            } else {
-                nodesOnSurfaceNormals[i][j] = null;
             }
           }
       }

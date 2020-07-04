@@ -3,8 +3,8 @@ HeadsUpDisplay hud = new HeadsUpDisplay();
 PShape[] rigidBodies = new PShape[1];
 OctreeTriangles ot = new OctreeTriangles(new OctantTris(new Vec3(0,0,0), new Vec3(20,40,20)), 15);
 Vec3 bunnyPosition = new Vec3();
-int clothWidth = 15;
-int clothHeight = 15;
+int clothWidth = 11;
+int clothHeight = 11;
 ClothMesh cloth;
 Fan fan;
 
@@ -17,7 +17,7 @@ void setup() {
     cloth = new ClothMesh(clothWidth, clothHeight);
     cloth.debugMode = true;
     fan = new Fan();
-    rigidBodies[0] = loadShape("cube.obj");
+    rigidBodies[0] = loadShape("sphere.obj");
 
     for (PShape rigidBody : rigidBodies) {
         int triCount = rigidBody.getChildCount();
@@ -35,10 +35,9 @@ void draw() {
     update(1.f/frameRate);
 
     cloth.draw();
-
+    fan.draw();
 
     shape(rigidBodies[0]);
-
 }
 
 void update(float dt) {
@@ -49,9 +48,13 @@ void update(float dt) {
         Ray3 mouseRay = getMouseCast();
         CollisionInfo c = raySphereCollision(mouseRay, cam.camLookAt, 4);
         if (c != null) {
+            fan.hidden = false;
             Vec3 fanPos = c.position;
             fan.updatePosition(fanPos, cam.camLookAt, cam.camUp, dt);
-            fan.draw();
+        } else {
+            fan.hidden = true;
         }
+    } else {
+        fan.hidden = true;
     }
 }
